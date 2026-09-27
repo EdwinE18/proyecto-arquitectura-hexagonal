@@ -1,0 +1,23 @@
+# Dependencias
+**/node_modules/
+
+# Variables de entorno (contraseñas, secretos)
+**/.env
+**/.env.local
+
+# Builds de producción
+frontend/dist/
+backend/dist/
+
+# Logs
+*.log
+npm-debug.log*
+
+# Sistema operativo / editor
+.DS_Store
+Thumbs.db
+.vscode/
+*.swp
+
+# Zone.Identifier de Windows (se genera al descargar archivos)
+*:Zone.Identifier
