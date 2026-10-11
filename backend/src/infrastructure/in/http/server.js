@@ -10,7 +10,8 @@ import { PostgresProductoRepository } from '../../out/postgres/PostgresProductoR
 import { PostgresPedidoRepository } from '../../out/postgres/PostgresPedidoRepository.js';
 import { BcryptPasswordHasher } from '../../out/security/BcryptPasswordHasher.js';
 import { JwtTokenService } from '../../out/security/JwtTokenService.js';
- 
+import { NodemailAdapter } from '../../out/email/NodemailAdapter.js';
+
 // --- Casos de uso (aplicación) ---
 import { RegistrarUsuarioUseCase } from '../../../application/usecases/RegistrarUsuarioUseCase.js';
 import { LoginUseCase } from '../../../application/usecases/LoginUseCase.js';
@@ -45,6 +46,7 @@ const productoRepository = new PostgresProductoRepository();
 const pedidoRepository = new PostgresPedidoRepository();
 const passwordHasher = new BcryptPasswordHasher();
 const tokenService = new JwtTokenService();
+const emailService = new NodemailAdapter();
  
 // ============================================
 // 2. Instanciar casos de uso, inyectando los puertos
@@ -58,8 +60,9 @@ const crearProductoUseCase = new CrearProductoUseCase(productoRepository);
 const listarProductosUseCase = new ListarProductosUseCase(productoRepository);
 const actualizarProductoUseCase = new ActualizarProductoUseCase(productoRepository);
 const eliminarProductoUseCase = new EliminarProductoUseCase(productoRepository);
- 
-const crearPedidoUseCase = new CrearPedidoUseCase(pedidoRepository, productoRepository);
+const crearPedidoUseCase = new CrearPedidoUseCase(pedidoRepository, productoRepository, usuarioRepository, emailService); 
+
+
 const listarPedidosUseCase = new ListarPedidosUseCase(pedidoRepository);
 const resolverPedidoUseCase = new ResolverPedidoUseCase(pedidoRepository);
  
