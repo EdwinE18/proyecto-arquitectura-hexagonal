@@ -5,12 +5,14 @@ import { adminService } from '../services/adminService.js';
 import { productoService } from '../../producto/services/productoService.js';
 import { pedidoService } from '../../pedido/services/pedidoService.js';
 import '../../../components/Dashboard.css';
+import { DashboardAnalitico } from './DashboardAnalitico.jsx';
 
 const TABS = {
   SOLICITUDES: 'solicitudes',
   USUARIOS: 'usuarios',
   PRODUCTOS: 'productos',
   PEDIDOS: 'pedidos',
+  ANALITICO: 'analitico',
 };
 
 export function AdminDashboard() {
@@ -55,6 +57,7 @@ export function AdminDashboard() {
       [TABS.USUARIOS]: cargarUsuarios,
       [TABS.PRODUCTOS]: cargarProductos,
       [TABS.PEDIDOS]: cargarPedidos,
+      [TABS.ANALITICO]: async () => {}, // el panel carga sus propios datos
     }[tabActivo];
 
     cargar()
@@ -116,6 +119,12 @@ export function AdminDashboard() {
             onClick={() => setTabActivo(TABS.PEDIDOS)}
           >
             Pedidos
+          </button>
+          <button
+            className={`tab ${tabActivo === TABS.ANALITICO ? 'activo' : ''}`}
+            onClick={() => setTabActivo(TABS.ANALITICO)}
+          >
+            Panel analítico
           </button>
         </div>
 
@@ -273,6 +282,7 @@ export function AdminDashboard() {
             {!cargando && pedidos.length === 0 && <div className="sin-datos">Sin pedidos registrados</div>}
           </div>
         )}
+        {tabActivo === TABS.ANALITICO && <DashboardAnalitico />}
       </div>
     </div>
   );

@@ -11,6 +11,7 @@ import { PostgresPedidoRepository } from '../../out/postgres/PostgresPedidoRepos
 import { BcryptPasswordHasher } from '../../out/security/BcryptPasswordHasher.js';
 import { JwtTokenService } from '../../out/security/JwtTokenService.js';
 import { NodemailAdapter } from '../../out/email/NodemailAdapter.js';
+import { AnalyticsRepositoryAdapter } from '../../out/postgres/AnalyticsRepositoryAdapter.js';
 
 // --- Casos de uso (aplicación) ---
 import { RegistrarUsuarioUseCase } from '../../../application/usecases/RegistrarUsuarioUseCase.js';
@@ -26,7 +27,8 @@ import { EliminarProductoUseCase } from '../../../application/usecases/producto/
 import { CrearPedidoUseCase } from '../../../application/usecases/pedido/CrearPedidoUseCase.js';
 import { ListarPedidosUseCase } from '../../../application/usecases/pedido/ListarPedidosUseCase.js';
 import { ResolverPedidoUseCase } from '../../../application/usecases/pedido/ResolverPedidoUseCase.js';
- 
+import { AnalyticsService } from '../../../application/usecases/analytics/AnalyticsService.js';
+
 // --- Controladores y rutas (adaptadores de entrada) ---
 import { AuthController } from './controllers/AuthController.js';
 import { AdminController } from './controllers/AdminController.js';
@@ -37,6 +39,8 @@ import { crearAuthRoutes } from './routes/authRoutes.js';
 import { crearAdminRoutes } from './routes/adminRoutes.js';
 import { crearProductoRoutes } from './routes/productoRoutes.js';
 import { crearPedidoRoutes } from './routes/pedidoRoutes.js';
+import { AnalyticsController } from './controllers/AnalyticsController.js';
+import { crearAnalyticsRoutes } from './routes/analyticsRoutes.js';
  
 // ============================================
 // 1. Instanciar adaptadores de salida (infraestructura)
@@ -47,7 +51,8 @@ const pedidoRepository = new PostgresPedidoRepository();
 const passwordHasher = new BcryptPasswordHasher();
 const tokenService = new JwtTokenService();
 const emailService = new NodemailAdapter();
- 
+const analyticsRepository = new AnalyticsRepositoryAdapter();
+
 // ============================================
 // 2. Instanciar casos de uso, inyectando los puertos
 // ============================================
@@ -55,6 +60,7 @@ const registrarUsuarioUseCase = new RegistrarUsuarioUseCase(usuarioRepository, p
 const loginUseCase = new LoginUseCase(usuarioRepository, passwordHasher, tokenService);
 const listarSolicitudesUseCase = new ListarSolicitudesPendientesUseCase(usuarioRepository);
 const resolverSolicitudUseCase = new ResolverSolicitudUsuarioUseCase(usuarioRepository);
+const analyticsService = new AnalyticsService(analyticsRepository);
  
 const crearProductoUseCase = new CrearProductoUseCase(productoRepository);
 const listarProductosUseCase = new ListarProductosUseCase(productoRepository);
@@ -78,7 +84,8 @@ const productoController = new ProductoController(
   eliminarProductoUseCase
 );
 const pedidoController = new PedidoController(crearPedidoUseCase, listarPedidosUseCase, resolverPedidoUseCase);
- 
+const analyticsController = new AnalyticsController(analyticsService);
+
 // ============================================
 // 4. Configurar Express y montar rutas
 // ============================================
@@ -95,7 +102,8 @@ app.use('/api/auth', crearAuthRoutes(authController));
 app.use('/api/admin', crearAdminRoutes(adminController));
 app.use('/api/productos', crearProductoRoutes(productoController));
 app.use('/api/pedidos', crearPedidoRoutes(pedidoController));
- 
+app.use('/api/reportes', crearAnalyticsRoutes(analyticsController));
+
 // Manejo de rutas no encontradas
 app.use((req, res) => {
   res.status(404).json({ error: 'Ruta no encontrada' });
